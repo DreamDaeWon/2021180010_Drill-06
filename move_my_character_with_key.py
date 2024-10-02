@@ -39,7 +39,9 @@ def Charater_left_right():
     global y
     global drawmouse
     global time
+    global mouse
     # 마우스보다 왼쪽에 있는지 오른쪽에 있는지?
+
 
     if x < mouse[0]:
         dirRL = 1
@@ -53,17 +55,19 @@ def Charater_left_right():
 
 
     if idle == False:
-        if y < mouse[1]:
-            y += 10
-        else:
-            y -= 10
+        t = time / 100
+        plus = 5/(t+1)
+        time += plus
+        t = time / 100
 
-        if x < mouse[0]:
-            x += 10
-        else:
-            x -= 10
+        y = (1-t)*y1 + t * mouse[1]
+        x = (1-t)*x1 + t * mouse[0]
 
-    if abs(mouse[1] - y) < 11 and abs(mouse[0] - x) < 11:
+    #if mouse[1] == y and mouse[0] == x:
+    #    idle = True
+    #    drawmouse = False
+
+    if abs(mouse[1] - y) < 6 and abs(mouse[0] - x) < 6:
         idle = True
         drawmouse = False
 
@@ -77,11 +81,20 @@ def draw_mouse():
     global drawmouse
     global idle
     global mouse
+    global y1
+    global y
+    global x1
+    global x
+    global time
+
 
     if idle:
         mouse = [random.randrange(50, 750), random.randrange(50, 550)]
         drawmouse = True
         idle = False
+        y1 = y
+        x1 = x
+        time = 0
 
 
     if drawmouse:
@@ -153,6 +166,9 @@ running = True
 frame = 0
 x = 800//2
 y = 600//2
+
+y1 = 0
+x1 = 0
 
 dirRL = 0
 dirUD = 0
