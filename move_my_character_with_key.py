@@ -1,3 +1,5 @@
+import random
+
 from pico2d import *
 
 open_canvas()
@@ -5,6 +7,7 @@ open_canvas()
 ground = load_image('TUK_GROUND.png')
 characteridle = load_image('idle.png')
 characterrun = load_image('run_ani.png')
+mouseimage = load_image('hand_arrow.png')
 
 
 idleanimation = 9
@@ -23,12 +26,66 @@ runnmm_w = [34,31,25,26,36]
 runnmm_h = [43,47,52,52,45]
 
 
+mouse = [random.randrange(50,750),random.randrange(50,550)]
+drawmouse =False
+
+
+time = 0
+
 def Charater_left_right():
     global dirRL
-    
+    global idle
+    global x
+    global y
+    global drawmouse
+    global time
+    # 마우스보다 왼쪽에 있는지 오른쪽에 있는지?
+
+    if x < mouse[0]:
+        dirRL = 1
+    elif x > mouse[0]:
+        dirRL = -1
+
+    if dirRL == 0 and dirUD == 0:
+        idle = True
+    else:
+        idle = False
+
+
+    if idle == False:
+        if y < mouse[1]:
+            y += 10
+        else:
+            y -= 10
+
+        if x < mouse[0]:
+            x += 10
+        else:
+            x -= 10
+
+    if abs(mouse[1] - y) < 11 and abs(mouse[0] - x) < 11:
+        idle = True
+        drawmouse = False
+
+
+
+
     pass
 
 
+def draw_mouse():
+    global drawmouse
+    global idle
+    global mouse
+
+    if idle:
+        mouse = [random.randrange(50, 750), random.randrange(50, 550)]
+        drawmouse = True
+        idle = False
+
+
+    if drawmouse:
+        mouseimage.draw(mouse[0],mouse[1])
 
 def key_event():
     global running
@@ -43,10 +100,7 @@ def key_event():
         if event.type == SDL_QUIT:
             running = False
 
-    if dirRL == 0 and dirUD == 0:
-        idle = True
-    else:
-        idle = False
+
 
 
     pass
@@ -63,15 +117,15 @@ def CharaterDraw():
 
     if idle:
         frame = (frame + 1) % 9
-        characteridle.clip_draw(idlenmm_x[frame],idlenmm_y[frame],idlenmm_w[frame],idlenmm_h[frame],x,y,idlenmm_w[frame]*3,idlenmm_h[frame]*3)
+        characteridle.clip_draw(idlenmm_x[frame],idlenmm_y[frame],idlenmm_w[frame],idlenmm_h[frame],x,y,idlenmm_w[frame]*2.5,idlenmm_h[frame]*2.5)
         #characteridle.clip_draw(50,50,50,50,x,y)
         #characteridle.draw(400,300)
     else:
         frame = (frame + 1) % 5
         if dirRL > 0:
-            characterrun.clip_draw(runnmm_x[frame], 62-runnmm_y[frame], runnmm_w[frame], runnmm_h[frame], x, y,runnmm_w[frame]*3,runnmm_h[frame]*3)
+            characterrun.clip_draw(runnmm_x[frame], 62-runnmm_y[frame], runnmm_w[frame], runnmm_h[frame], x, y,runnmm_w[frame]*2.5,runnmm_h[frame]*2.5)
         else:
-            characterrun.clip_composite_draw(runnmm_x[frame], 62-runnmm_y[frame], runnmm_w[frame], runnmm_h[frame],0,'h', x, y,runnmm_w[frame]*3,runnmm_h[frame]*3)
+            characterrun.clip_composite_draw(runnmm_x[frame], 62-runnmm_y[frame], runnmm_w[frame], runnmm_h[frame],0,'h', x, y,runnmm_w[frame]*2.5,runnmm_h[frame]*2.5)
         pass
 
 def PlayerControl():
@@ -106,12 +160,16 @@ dirUD = 0
 idle = True
 
 while running:
+
     clear_canvas()
     ground.draw(400, 300)
+
     CharaterDraw()
+    draw_mouse()
     update_canvas()
     key_event()
     #PlayerControl()
+    Charater_left_right()
 
     delay(0.05)
 
